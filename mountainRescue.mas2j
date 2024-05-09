@@ -1,0 +1,9 @@
+MAS mountainRescue {
+    environment: hu.bme.mit.Simulator.Env
+
+    agents:
+        rescuer #6;
+        controller;
+
+    aslSourcePath: "src/main/asl";
+}
