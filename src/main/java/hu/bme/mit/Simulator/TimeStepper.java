@@ -4,7 +4,7 @@ public class TimeStepper implements Runnable{
 
     private boolean stopped;
     private int speed;
-    private Simulator simulator;
+    private final Simulator simulator;
 
     public TimeStepper(Simulator simulator){
         stopped = false;

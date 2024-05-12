@@ -1,50 +1,52 @@
 package hu.bme.mit.RescueFramework;
 
-import hu.bme.mit.World.Coordinate;
-import hu.bme.mit.World.Field;
-import hu.bme.mit.World.Map;
+import hu.bme.mit.World.fields.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import static hu.bme.mit.World.FieldType.*;
-
 
 public class Loader {
-    private Map map = new Map();
+
+    private final Map map = new Map();
+    private final String configPath = "src\\main\\java\\hu\\bme\\mit\\World\\map\\map.txt";
+
     public void load()  {
         try {
-            File configFile = new File("sources/map.txt");
+            File configFile = new File(configPath);
             Scanner scanner = new Scanner(configFile);
-            String line_one = scanner.nextLine();
-            int width = Integer.valueOf(line_one);
-            String line_two = scanner.nextLine();
-            int height = Integer.valueOf(line_two);
-            Field[][] fields = new Field[height][width];
-            int line_num = 0;
-        while(scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            String[] splittedLine = line.split(" ");
-            for(int i=0; i< splittedLine.length; i++) {
-                if(splittedLine[i].equals("+"))
-                    fields[line_num][i] = new Field(FOREST, new Coordinate(line_num, i));
-                else if (splittedLine[i].equals("-"))
-                    fields[line_num][i] = new Field(MOUNTAIN, new Coordinate(line_num, i));
-                else
-                    fields[line_num][i] = new Field(STATION, new Coordinate(line_num, i));
 
+            int width = Integer.parseInt(scanner.nextLine());
+            int height = Integer.parseInt(scanner.nextLine());
 
+            map.setHeight(height);
+            map.setWidth(width);
+
+            Field[][] fields = new Field[width][height];
+
+            int row = 0;
+            while(scanner.hasNextLine()) {
+                String[] splitLine = scanner.nextLine().split(" ");
+
+                for(int col=0; col < splitLine.length; col++) {
+                    if(splitLine[col].equals("+"))
+                        fields[col][row] = new Forest(new Coordinate(col, row));
+                    else if (splitLine[col].equals("-"))
+                        fields[col][row] = new Mountain(new Coordinate(col, row));
+                    else {
+                        Station station = new Station(new Coordinate(col, row));
+                        fields[col][row] = station;
+                        map.addStation(station);
+                    }
+                }
+                row++;
             }
-            line_num++;
-        }
-        map.setFields(fields);
-        map.setHeight(height);
-        map.setWidth(width);
-        scanner.close();
+
+            map.setFields(fields);
+            scanner.close();
         } catch (FileNotFoundException e) {
-        System.out.println("An error occurred.");
-        e.printStackTrace();
+            System.err.println("Couldn't read the map config file.");
         }
     }
 
