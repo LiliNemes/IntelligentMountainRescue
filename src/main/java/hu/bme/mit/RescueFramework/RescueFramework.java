@@ -36,14 +36,38 @@ public class RescueFramework {
         Loader loader = new Loader();
         loader.load();
         map = loader.getMap();
+
+        simulator = new Simulator();
+
         mainFrame = new MainFrame();
         mainFrame.setVisible(true);
-
     }
 
-    public static void refresh() {
-        if (mainFrame != null)  mainFrame.refresh();
+    public static Map getMap() {
+        return map;
     }
 
+    public static void newSimulation(int troopCount, int heliCount) {
+        for (int i = 0; i < troopCount + heliCount; i++){
+            if (i < troopCount){
+                Troop troop = new Troop(map.getStations().getFirst(), agentId);
+                simulator.addRescuer(troop);
+                env.addAgent("troop" + agentId , agentId);
+            }
+            else {
+                Helicopter heli = new Helicopter(map.getStations().getLast(), agentId);
+                simulator.addRescuer(heli);
+                env.addAgent("heli" + agentId, agentId);
+            }
+            agentId++;
+        }
+        mainFrame.refresh();
+    }
 
+    public static void endSimulation() {
+        map.reset();
+        simulator.reset();
+        env.reset();
+        mainFrame.refresh();
+    }
 }

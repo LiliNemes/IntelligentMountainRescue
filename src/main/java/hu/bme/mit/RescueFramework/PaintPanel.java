@@ -19,7 +19,7 @@ public class PaintPanel extends JPanel {
 
     @Override
     public void paintComponent(Graphics g){
-        Map map = RescueFramework.map;
+        Map map = RescueFramework.getMap();
         if (map == null) {
             return;
         }

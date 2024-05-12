@@ -38,16 +38,26 @@ public class Simulator {
         for (Rescuer rescuer : rescuers.values()){
             Action whatHappened = rescuer.step(bothCanStep);
             switch(whatHappened){
-                case MOVE -> {}
                 case PICKUP -> rescuedPerson(rescuer.getCurrentLocation());
                 case DELIVER -> deliveredPerson();
+                default -> {}
             }
         }
         for (Injured injured : injureds.values()){
             boolean isDead = injured.step();
             if(isDead){
                 injuredTragedy(injured);
+                toRemove.add(injured);
+                deathHappened = true;
             }
+        }
+
+        if (deathHappened){
+            for (Injured injured : toRemove){
+                injureds.remove(injured.getId());
+            }
+            toRemove.clear();
+            optimization();
         }
 
         RescueFramework.refresh();
@@ -76,7 +86,6 @@ public class Simulator {
         for (Rescuer rescuer : rescuers.values()) {
             rescuer.injuredFallen(injured.getLocation());
         }
-        optimization();
     }
 
     private void optimization(){
