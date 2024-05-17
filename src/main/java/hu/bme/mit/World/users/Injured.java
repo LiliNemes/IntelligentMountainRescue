@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class Injured implements Drawable {
 
-    private int id;
+    private final int id;
     private final float maxHealth = 20F;
     private int health = 20;
     private Field location;

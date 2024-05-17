@@ -31,7 +31,6 @@ public class Simulator {
     private int time=0;
     private final int helicopterSpeed = 3;
     private TimeStepper timeStepper = null;
-    private boolean stopped = true;
     private int savedPeople = 0;
     private int deadPeople = 0;
 
@@ -42,7 +41,6 @@ public class Simulator {
         if(timeStepper!=null){
             timeStepper.stop();
         }
-        stopped = false;
         timeStepper = new TimeStepper(this);
         new Thread(timeStepper).start();
     }
@@ -175,7 +173,6 @@ public class Simulator {
      * Stops the simulation.
      */
     public void stop() {
-        stopped = true;
         if (timeStepper != null)
             timeStepper.stop();
     }
