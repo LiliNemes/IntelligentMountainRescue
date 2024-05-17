@@ -8,6 +8,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Class for the Troop.
+ */
 public class Troop extends Rescuer{
 
     private final String imageName = "troop.png";
@@ -16,12 +19,26 @@ public class Troop extends Rescuer{
         super(location, id);
     }
 
+    /**
+     * The troop can move in every third time step, but cannot land on mountain fields.
+     * @param bothCanStep true if both rescuers can step, false otherwise (if only the helicopter can step).
+     * @return the action of the helicopter.
+     */
     @Override
     public Action step(boolean bothCanStep) {
         //TODO
+        //Ha false a paraméter, akkor ne lépjen.
+        //Lépjen a path-ját követve.
+        //Ha elér az emberéhez (céljához) vegye fel.
+        //Olyan Actionnel térjen vissza ami igaz arra amit csinált.
         return Action.MOVE;
     }
 
+    /**
+     * Draws the troop on the field.
+     * @param g the graphics object.
+     * @param fieldSize the size of the field.
+     */
     @Override
     public void draw(Graphics2D g, int fieldSize) {
         BufferedImage img = null;

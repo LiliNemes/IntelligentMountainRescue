@@ -10,8 +10,8 @@ public class MainFrame extends JFrame {
     private JButton stepButton;
     private JButton autoButton;
     private JButton pauseButton;
-    private JComboBox<String> jComboBox1;
-    private JLabel jLabel1;
+    //private JComboBox<String> jComboBox1;
+    //private JLabel jLabel1;
     private JLabel savedCounterText;
     private JLabel helicopterText;
     private JLabel speedText;
@@ -37,8 +37,8 @@ public class MainFrame extends JFrame {
     private void initComponents() {
 
         jPanel1 = new JPanel();
-        jLabel1 = new JLabel();
-        jComboBox1 = new JComboBox<>();
+        //jLabel1 = new JLabel();
+        //jComboBox1 = new JComboBox<>();
         startButton = new JButton();
         stopButton = new JButton();
         savedCounterText = new JLabel();
@@ -64,10 +64,10 @@ public class MainFrame extends JFrame {
 
         jPanel1.setPreferredSize(new Dimension(924, 33));
 
-        jLabel1.setText("Map:");
+        //jLabel1.setText("Map:");
 
-        jComboBox1.setModel(new DefaultComboBoxModel<>(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
-        jComboBox1.setFocusable(false);
+        //jComboBox1.setModel(new DefaultComboBoxModel<>(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
+        //jComboBox1.setFocusable(false);
 
         startButton.setText("Start");
         startButton.addActionListener(event -> initSimulation());
@@ -126,9 +126,9 @@ public class MainFrame extends JFrame {
                 jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel1)
+                                //.addComponent(jLabel1)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jComboBox1, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE)
+                                //.addComponent(jComboBox1, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
 
                                 .addComponent(helicopterText)
@@ -177,8 +177,8 @@ public class MainFrame extends JFrame {
                                                 .addComponent(troopsCount, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                                 .addComponent(startButton)
                                                 .addComponent(stopButton)
-                                                .addComponent(jComboBox1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(jLabel1)
+                                                //.addComponent(jComboBox1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                //.addComponent(jLabel1)
                                                 .addComponent(helicopterCount, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                                 .addComponent(helicopterText)
                                                 .addComponent(stepButton)

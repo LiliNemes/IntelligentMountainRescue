@@ -13,7 +13,7 @@ public class Map {
     private final List<Station> stations = new ArrayList<>();
 
     /**
-     * Sets the fields of the map
+     * Sets the fields of the map and sets the neighbours of the fields.
      * @param fields the fields of the map
      */
     public void setFields(Field[][] fields){
@@ -32,32 +32,69 @@ public class Map {
         }
     }
 
+    /**
+     * Adds a station to the map.
+     * @param station the station to be added.
+     */
     public void addStation(Station station){
         stations.add(station);
     }
 
+    /**
+     * Returns the stations of the map.
+     * @return the stations of the map.
+     */
     public List<Station> getStations(){
         return stations;
     }
 
-    public int getWidthX() {
+    /**
+     * Returns the width of the map.
+     * @return the width of the map.
+     */
+    public int getWidth() {
         return widthX;
     }
+
+    /**
+     * Returns the height of the map.
+     * @return the height of the map.
+     */
     public int getHeight() {
         return heightY;
     }
+    /**
+     * Returns the field at the given coordinates.
+     * @param width the width coordinate of the field.
+     * @param height the height coordinate of the field.
+     * @return the field at the given coordinates.
+     */
     public Field getField(int width, int height){
         return fields[width][height];
     }
 
+    /**
+     * Sets the height of the map.
+     * @param height the height of the map.
+     */
     public void setHeight(int height) {
         this.heightY = height;
     }
 
+    /**
+     * Sets the width of the map.
+     * @param width the width of the map.
+     */
     public void setWidth(int width) {
         this.widthX = width;
     }
 
+    /**
+     * Calculates the shortest path possible between two fields.
+     * @param start the starting field.
+     * @param end the ending field.
+     * @return the fields of the map.
+     */
     public static List<Direction> getPath(Field start, Field end){
         ArrayList<Direction> path = new ArrayList<>();
         //UP
@@ -79,11 +116,29 @@ public class Map {
         return path;
     }
 
+    /**
+     * Resets the visitors of all the fields.
+     */
     public void reset() {
         for (Field[] field : fields){
             for (Field f : field){
                 f.clearVisitors();
             }
         }
+    }
+
+    public List<Direction> getNearestStation(Field location) {
+        int minDistance = fields.length;
+        List<Direction> shortestPath = null;
+
+        for (Station station : stations){
+            List<Direction> p = getPath(location, station);
+            if (p.size() <= minDistance){
+                minDistance = p.size();
+                shortestPath = p;
+            }
+        }
+
+        return shortestPath;
     }
 }

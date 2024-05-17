@@ -24,7 +24,7 @@ public class PaintPanel extends JPanel {
             return;
         }
         // Calculate cellSize
-        int cellWidth = getWidth() / map.getWidthX();
+        int cellWidth = getWidth() / map.getWidth();
         int cellHeight = getHeight() / map.getHeight();
         fieldSize = Math.min(cellWidth, cellHeight);
 
@@ -32,7 +32,7 @@ public class PaintPanel extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
 
         // Paint fields one by one
-        for (int x = 0; x < map.getWidthX(); x++) {
+        for (int x = 0; x < map.getWidth(); x++) {
             for (int y = 0; y < map.getHeight(); y++) {
                 map.getField(x, y).draw(g2, fieldSize);
             }

@@ -6,12 +6,17 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Class for the Station field.
+ */
 public class Station extends Field{
 
     private final String imageName = "station.jpg";
 
     public Station(Coordinate coordinate) {
         super(coordinate);
+        this.isFlat = true;
+
         try {
             this.img = ImageIO.read(new File(baseDir + imageName));
         } catch (IOException ex) {

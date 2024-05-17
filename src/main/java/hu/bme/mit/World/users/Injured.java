@@ -8,6 +8,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Class for the Injured.
+ */
 public class Injured implements Drawable {
 
     private int id;
@@ -21,33 +24,37 @@ public class Injured implements Drawable {
         this.id = id;
     }
 
+    /**
+     * Decreases the health of the injured in every timestep.
+     * @return true if the health is 0, false otherwise.
+     */
     public boolean step() {
         health--;
-        if (health <= 0)
+        if (health <= 0) {
             health = 0;
+            location.removeVisitor(this);
+        }
         return health == 0;
     }
-
+    /**
+     * Returns the ID of the injured.
+     * @return the ID of the injured.
+     */
     public int getId() {
         return id;
     }
-
-    public void setID(int ID) {
-        this.id = ID;
-    }
-
-    public int getHealth() {
-        return health;
-    }
-
-    public void setHealth(int health) {
-        this.health = health;
-    }
-
+    /**
+     * Returns the location of the injured.
+     * @return the location of the injured.
+     */
     public Field getLocation() {
         return location;
     }
 
+    /**
+     * Sets the location of the injured.
+     * @param location the location of the injured.
+     */
     public void setLocation(Field location) {
         this.location = location;
         try {
@@ -57,10 +64,19 @@ public class Injured implements Drawable {
         }
     }
 
+    /**
+     * Returns the health of the injured.
+     * @return the health of the injured.
+     */
     public float getHealthRatio() {
         return (health / maxHealth);
     }
 
+    /**
+     * RDraws the injured object.
+     * @param g the graphics object.
+     * @param fieldSize the size of the field.
+     */
     @Override
     public void draw(Graphics2D g, int fieldSize) {
 
@@ -87,6 +103,11 @@ public class Injured implements Drawable {
         }
     }
 
+    /**
+     * Calculates the color of the health bar based on the health ratio.
+     * @param value the health ratio.
+     * @return the color of the health bar.
+     */
     private Color calculateColor(float value) {
         double red = 0, green = 0, blue = 0;
 
