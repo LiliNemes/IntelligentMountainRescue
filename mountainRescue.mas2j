@@ -3,7 +3,6 @@ MAS mountainRescue {
 
     agents:
         controller;
-        rescuer;
 
     aslSourcePath: "src/main/asl";
 }
