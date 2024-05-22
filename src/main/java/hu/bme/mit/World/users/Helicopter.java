@@ -26,6 +26,16 @@ public class Helicopter extends Rescuer{
     }
 
     /**
+     * The helicopter is the fastest, its slowness can be 1
+     * @param physicalDistance the distance to weigh
+     * @return physicalDistance
+     */
+    @Override
+    public int getWeightedDistance(int physicalDistance) {
+        return physicalDistance;
+    }
+
+    /**
      * The helicopter can move in every time step, but cannot land on mountain fields.
      * @param bothCanStep true if both rescuers can step, false otherwise (if only the helicopter can step).
      * @return the action of the helicopter.
@@ -33,9 +43,10 @@ public class Helicopter extends Rescuer{
     @Override
     public Action step(boolean bothCanStep) {
         //TODO
-        //Lépjen a path-ját követve.
-        //Ha elér az emberéhez vegye fel.
-        //Olyan Actionnel térjen vissza ami igaz arra amit csinált.
+        // Lépjen a path-ját követve.
+        // Ha elér az emberéhez vegye fel.
+        // Ha elér a stationre, akkor adja le a szállított sérültet.
+        // Olyan Actionnel térjen vissza ami igaz arra amit csinált.
         Direction newLocation = path.removeFirst();
 
         currentLocation = currentLocation.getNeighbour(newLocation);

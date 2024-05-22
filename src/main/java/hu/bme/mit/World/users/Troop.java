@@ -14,6 +14,7 @@ import java.io.IOException;
 public class Troop extends Rescuer{
 
     private final String imageName = "troop.png";
+    private final int slowness = 3;
 
     public Troop(Field location, int id) {
         super(location, id);
@@ -27,11 +28,18 @@ public class Troop extends Rescuer{
     @Override
     public Action step(boolean bothCanStep) {
         //TODO
-        //Ha false a paraméter, akkor ne lépjen.
-        //Lépjen a path-ját követve.
-        //Ha elér az emberéhez (céljához) vegye fel.
-        //Olyan Actionnel térjen vissza ami igaz arra amit csinált.
+        // Ha false a paraméter, akkor ne lépjen, de still MOVE-al térjen vissza.
+        // Lépjen a path-ját követve.
+        // Ha elér az emberéhez (céljához) vegye fel.
+        // Ha elér a stationre, akkor adja le a szállított sérültet - feltételelzzük, hogy ekkor szállít,
+        // mivel ha nem szállít, akkor se célja nincs, se pathja (az üres, nem null)-
+        // Olyan Actionnel térjen vissza ami igaz arra amit csinált.
         return Action.MOVE;
+    }
+
+    @Override
+    public int getWeightedDistance(int physicalDistance) {
+        return this.slowness * physicalDistance;
     }
 
     /**

@@ -110,6 +110,7 @@ public class Env extends Environment{
         }
         for (int rescuer : toRemove){
             currentBids.remove(rescuer);
+            RescueFramework.getSimulator().resetTarget(rescuer);
         }
         toRemove.clear();
 
