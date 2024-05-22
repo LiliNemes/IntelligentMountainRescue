@@ -1,5 +1,6 @@
 package hu.bme.mit.World.users;
 
+import hu.bme.mit.World.fields.Direction;
 import hu.bme.mit.World.fields.Field;
 
 import javax.imageio.ImageIO;
@@ -35,7 +36,15 @@ public class Helicopter extends Rescuer{
         //Lépjen a path-ját követve.
         //Ha elér az emberéhez vegye fel.
         //Olyan Actionnel térjen vissza ami igaz arra amit csinált.
-        return Action.MOVE;
+        Direction newLocation = path.removeFirst();
+
+        currentLocation = currentLocation.getNeighbour(newLocation);
+        if (!path.isEmpty()) {
+            return Action.MOVE;
+        }
+        else {
+            return Action.PICKUP;
+        }
     }
 
     /**
