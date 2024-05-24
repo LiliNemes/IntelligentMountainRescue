@@ -42,20 +42,36 @@ public class Helicopter extends Rescuer{
      */
     @Override
     public Action step(boolean bothCanStep) {
-        //TODO
-        // Lépjen a path-ját követve.
-        // Ha elér az emberéhez vegye fel.
-        // Ha elér a stationre, akkor adja le a szállított sérültet.
-        // Olyan Actionnel térjen vissza ami igaz arra amit csinált.
-        Direction newLocation = path.removeFirst();
-
-        currentLocation = currentLocation.getNeighbour(newLocation);
+        // Ha bothCanStep értéke false, akkor a másik mentőegység nincs rendelkezésre a lépéshez,
+    // ezért a helikopter is léphet.
+    if (!bothCanStep) {
+        // Ha a másik mentőegység nem léphet, de a helikopter rendelkezésre áll,
+        // akkor az MOVE akcióval lépjen.
+        return Action.MOVE;
+    } else {
+        // Ha mindkét mentőegység rendelkezésre áll a lépéshez,
+        // akkor meg kell vizsgálni a helikopter célját és útvonalát.
         if (!path.isEmpty()) {
+            // Ha a helikopter még rendelkezik útvonallal,
+            // akkor MOVE akcióval lépjen a következő mezőre az útvonal mentén.
             return Action.MOVE;
         }
-        else {
+
+        // Ha a helikopter elérte az emberéhez (céljához) tartózkodó mezőt,
+        // akkor vegye fel az illetőt.
+        if (currentLocation == targetLocation && targetLocation == null){
             return Action.PICKUP;
+        } 
+        // Ha a helikopter elérte a szállítási állomást,
+        // és nem rendelkezik további útvonallal,
+        // akkor adja le a szállított sérültet.
+        else if (targetLocation == null && path.isEmpty()) {
+            return Action.DELIVER;
         }
+    }
+    // Alapértelmezett esetben, ha nincs más teendő,
+    // akkor is MOVE akcióval térjen vissza.
+    return Action.MOVE;
     }
 
     /**
