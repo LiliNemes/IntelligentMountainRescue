@@ -4,19 +4,19 @@
 // A nevét nem kell tárolja mert azt beépítetten tárolja.
 // a használandó beliefek/perceptionök nevei az Env osztályból kiolvashatók többségében (van amihez nem nyúl hozzá az Env)
 
-!start.
++!start
+<- .my_name(Name);
+   .print("Rescuer agent started with name: ", Name);
 
-// Kezdeményezési cél
-+!start <-
-    .print("Agent Rescuer started.").
+// Képességek kezelése
++newBid(InjuredId, BidValue)
+<- .my_name(Name);
+   .print("Received newBid for Injured ", InjuredId, " with BidValue ", BidValue);
+   !sendBidToController(InjuredId, BidValue);
+   -+newBid(InjuredId, BidValue);
 
-
-// Reakció a newBid belief érkezésére
-+!processBid(BidValue, Bidder) : newBid(BidValue, Bidder) <-
-    .my_name(Me);
-    .send(controller, tell, setBids(Me, BidValue, Bidder));
-    -newBid(BidValue, Bidder).
-
-// Példa percept kezelés (nem szükséges, ha nem kap új percepteket)
-+percept(newBid(BidValue, Bidder)) <-
-    !processBid(BidValue, Bidder).
+// Cél: a bid továbbítása a controller-nek
++!sendBidToController(InjuredId, BidValue)
+<- .my_name(Name);
+   .send(controller, tell, newBid(Name, InjuredId, BidValue));
+   .print("Sent bid to controller: ", newBid(Name, InjuredId, BidValue));
