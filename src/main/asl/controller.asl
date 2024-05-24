@@ -8,112 +8,61 @@
 // praktikus ellenőrizni, hogy egy rwscuer egy sérültre ne addhasson több szavazatot
 // a használandó beliefek/perceptionök nevei az Env osztályból kiolvashatók többségében (van amihez nem nyúl hozzá az Env)
 
-{
-  "initial_beliefs": [
-    "remainingVotes(0)",
-    "bestInjured(none)",
-    "bestCost(1000000)",
-    "bestRescuer(none)",
-    "rescuerBid([])"
-  ],
-  "initial_goals": [
-    "manage_bids"
-  ],
-  "plans": [
-    {
-      "trigger": "+!manage_bids",
-      "context": "percept(remaining(R))",
-      "body": [
-        "+remainingVotes(R)",
-        {
-          "while": "remainingVotes(N) & N > 0",
-          "do": [
-            "+!evaluate_bid"
-          ]
-        }
-      ]
-    },
-    {
-      "trigger": "+!evaluate_bid",
-      "context": "percept(newBid(Injured, Bid, Rescuer))",
-      "body": [
-        "remainingVotes(N)",
-        {
-          "if": "N == 1",
-          "then": [
-            "+update_rescuerBid(Rescuer, Injured, Bid)",
-            "+!finalize_bidding"
-          ],
-          "else": [
-            "+update_rescuerBid(Rescuer, Injured, Bid)",
-            "-remainingVotes(N)",
-            "+remainingVotes(N-1)"
-          ]
-        }
-      ]
-    },
-    {
-      "trigger": "+!finalize_bidding",
-      "context": "true",
-      "body": [
-        "+!calculate_min_avg"
-      ]
-    },
-    {
-      "trigger": "+!calculate_min_avg",
-      "context": "true",
-      "body": [
-        "+find_min_avg(Rescuer, Injured, BestCost)",
-        "+allocate(Rescuer, Injured)",
-        "+bestInjured(Injured)",
-        "+bestCost(BestCost)",
-        "+bestRescuer(Rescuer)",
-        "+!update_beliefs"
-      ]
-    },
-    {
-      "trigger": "+!update_beliefs",
-      "context": "true",
-      "body": [
-        "+remainingVotes(0)",
-        "+bestInjured(none)",
-        "+bestCost(1000000)",
-        "+bestRescuer(none)",
-        "+rescuerBid([])"
-      ]
-    }
-  ],
-  "actions": [
-    {
-      "name": "update_rescuerBid",
-      "params": ["Rescuer", "Injured", "Bid"],
-      "body": [
-        "rescuerBid(RB)",
-        "append([(Rescuer, Injured, Bid)], RB, NewRB)",
-        "-rescuerBid(RB)",
-        "+rescuerBid(NewRB)"
-      ]
-    },
-    {
-      "name": "find_min_avg",
-      "params": ["Rescuer", "Injured", "BestCost"],
-      "body": [
-        "rescuerBid(RB)",
-        "calculate_average_cost(RB, AvgCosts)",
-        "find_min(AvgCosts, (BestRescuer, BestAvg))",
-        "find_min_bid(RB, BestRescuer, (BestInjured, BestBid))",
-        "Rescuer = BestRescuer",
-        "Injured = BestInjured",
-        "BestCost = BestBid"
-      ]
-    },
-    {
-      "name": "allocate",
-      "params": ["Rescuer", "Injured"],
-      "body": [
-        ".send(env, tell, allocate_injured(Rescuer, Injured))"
-      ]
-    }
-  ]
-}
+// Initialization
+!start.
 
++!start <-
+    .print("Agent Controller started.");
+    +remainingVotes(0);
+    +bestBid(infinity, none, none);
+    .print("Initialization complete: remainingVotes(0), bestBid(infinity, none, none)").
+
+// Handle receiving a new bid when it is better than the current best
++!processBid(BidValue, Rescuer, Injured) : remainingVotes(VotesLeft) & bestBid(CurrentBest, _, _) & BidValue < CurrentBest <-
+    !updateBestBid(BidValue, Rescuer, Injured);
+    !decreaseVotes.
+
+// Handle receiving a new bid when it is not better than the current best
++!processBid(BidValue, Rescuer, Injured) : remainingVotes(VotesLeft) & bestBid(CurrentBest, _, _) & BidValue >= CurrentBest <-
+    !decreaseVotes.
+
+// Update the best bid
++!updateBestBid(BidValue, Rescuer, Injured) <-
+    -bestBid(_, _, _);
+    +bestBid(BidValue, Rescuer, Injured).
+
+// Decrease the number of remaining votes
++!decreaseVotes : remainingVotes(VotesLeft) <-
+    NewVotesLeft = VotesLeft - 1;
+    -remainingVotes(VotesLeft);
+    +remainingVotes(NewVotesLeft);
+    !checkFinalizeVote.
+
+// Check if finalization is needed
++!checkFinalizeVote : remainingVotes(0) <-
+    !finalizeVoteWithBestBid.
+
++!checkFinalizeVote : remainingVotes(VotesLeft) & VotesLeft > 0 <-
+    .print("Remaining votes: ", VotesLeft, ". Continuing bid processing.").
+
+// Finalize the voting process with the best bid
++!finalizeVoteWithBestBid : bestBid(BestValue, BestRescuer, BestInjured) & BestValue \== infinity <-
+    .send(env, achieve, allocateInjured(BestRescuer, BestInjured)).
+
+// Handle the case when no valid bids are received
++!finalizeVoteWithBestBid : bestBid(BestValue, _, _) & BestValue == infinity <-
+    .print("No valid bids received.").
+
+// Percept handler for new bids
++percept(newBid(Injured, BidValue, Rescuer)) <-
+    !processBid(BidValue, Rescuer, Injured).
+
+// Percept handler for remaining votes
++percept(remaining(Votes)) <-
+    -remainingVotes(_);
+    +remainingVotes(Votes).
+
+// Percept handler for the best cost
++percept(bestCost(Value)) <-
+    -bestBid(_, _, _);
+    +bestBid(Value, none, none).

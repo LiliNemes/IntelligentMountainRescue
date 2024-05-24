@@ -1,5 +1,6 @@
 package hu.bme.mit.World.users;
 
+import hu.bme.mit.World.fields.Direction;
 import hu.bme.mit.World.fields.Field;
 
 import javax.imageio.ImageIO;
@@ -34,6 +35,21 @@ public class Troop extends Rescuer{
         // Ha elér a stationre, akkor adja le a szállított sérültet - feltételelzzük, hogy ekkor szállít,
         // mivel ha nem szállít, akkor se célja nincs, se pathja (az üres, nem null)-
         // Olyan Actionnel térjen vissza ami igaz arra amit csinált.
+        if (!bothCanStep) {
+            return Action.MOVE;
+        } else {
+            //Direction newLocation = path.remove(0);
+
+            //currentLocation = currentLocation.getNeighbour(newLocation);
+            if (!path.isEmpty()) {
+                return Action.MOVE;
+            }
+            if (currentLocation == targetLocation && targetLocation == null){
+                return Action.PICKUP;
+            } else if (targetLocation == null && path.isEmpty()) {
+                return Action.DELIVER;
+            }
+        }
         return Action.MOVE;
     }
 
