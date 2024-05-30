@@ -1,4 +1,4 @@
-# IntelligentMountainRescue
+# Intelligent Mountain Rescue
 
 This is a Search and Rescue (SAR) application with a 
 forest-mountain national park. In the simulation, hikers in distress
