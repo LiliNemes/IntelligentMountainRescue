@@ -18,6 +18,9 @@ There are two types of fields: forest and mountain.
 Mountain fields are not accessible to helicopter agents, but they can make 3 steps in a unit of time, as opposed to the troops on foot who can only move one field in that time. 
 The user, in addition to dropping off hikers in distress, can set at the start of the simulation
 the number of helicopter or foot rescue unit agents and the speed of the simulation.
+  
+A demo video of the working application:  
+<video width="630" height="300" src="https://github.com/LiliNemes/IntelligentMountainRescue/assets/38107045/318ffceb-70a1-4469-8693-69a6d161fdcb"></video>
 
 
 ## To contribute
