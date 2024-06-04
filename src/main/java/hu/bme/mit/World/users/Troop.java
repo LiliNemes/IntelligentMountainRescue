@@ -28,29 +28,27 @@ public class Troop extends Rescuer{
      */
     @Override
     public Action step(boolean bothCanStep) {
-        //TODO
-        // Ha false a paraméter, akkor ne lépjen, de still MOVE-al térjen vissza.
-        // Lépjen a path-ját követve.
-        // Ha elér az emberéhez (céljához) vegye fel.
-        // Ha elér a stationre, akkor adja le a szállított sérültet - feltételelzzük, hogy ekkor szállít,
-        // mivel ha nem szállít, akkor se célja nincs, se pathja (az üres, nem null)-
-        // Olyan Actionnel térjen vissza ami igaz arra amit csinált.
         if (!bothCanStep) {
             return Action.MOVE;
         } else {
-            //Direction newLocation = path.remove(0);
-
-            //currentLocation = currentLocation.getNeighbour(newLocation);
             if (!path.isEmpty()) {
-                return Action.MOVE;
+                Direction direction = path.removeFirst();
+                currentLocation.removeVisitor(this);
+                currentLocation = currentLocation.getNeighbour(direction);
+                currentLocation.addVisitor(this);
+
+                if (currentLocation == targetLocation) {
+                    if (!path.isEmpty())
+                        throw new RuntimeException("Path should be empty when reaching the target");
+
+                    return Action.PICKUP;
+                } else if (targetLocation == null && path.isEmpty()) {
+                    return Action.DELIVER;
+                }
+
             }
-            if (currentLocation == targetLocation && targetLocation == null){
-                return Action.PICKUP;
-            } else if (targetLocation == null && path.isEmpty()) {
-                return Action.DELIVER;
-            }
+            return Action.MOVE;
         }
-        return Action.MOVE;
     }
 
     @Override

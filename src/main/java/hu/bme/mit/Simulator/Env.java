@@ -81,9 +81,9 @@ public class Env extends Environment{
     public boolean executeAction(String agName, Structure action){
         if (action.getFunctor().equals("optimize")){
             try {
-                int rescuerId = (int) ((NumberTerm) action.getTerm(0)).solve();
+                String rescuerName = action.getTerm(0).toString();
                 int injuredId = (int) ((NumberTerm) action.getTerm(1)).solve();
-                updateCurrentBids(rescuerId, injuredId);
+                updateCurrentBids(agentIds.get(rescuerName), injuredId);
             }
             catch (NoValueException e){
                 System.err.println("Bad usage of the optimize function!!\n" +
@@ -147,25 +147,32 @@ public class Env extends Environment{
      * Informs the rescuers about the new bids.
      */
     public void informRescuers() {
+        int counter = 0;
+        for (Integer rescuerId : currentBids.keySet()){
+            for (Integer injuredId : currentBids.get(rescuerId).keySet()){
+                counter++;
+            }
+        }
+
         clearAllPercepts();
 
-        int counter = 0;
+        //Adding perception to the controller agent about the remaining bids and initializing the best cost for the injureds.
+        addPercept(controllerName, Literal.parseLiteral("remaining").addTerms(new NumberTermImpl(counter)));
+        addPercept(controllerName, Literal.parseLiteral("bestCost").addTerms(
+                new NumberTermImpl((RescueFramework.getMap().getHeight() + RescueFramework.getMap().getWidth())*iteration*10*3)
+        ));
+        informAgsEnvironmentChanged(controllerName);
+
         //For every rescuer.
         for (Integer rescuerId : currentBids.keySet()){
             //For every injured it can reach.
             for (Integer injuredId : currentBids.get(rescuerId).keySet()){
                 //Adding new perception to the agent in the form of injured - bid for this injured.
                 addPercept(agentNames.get(rescuerId), Literal.parseLiteral("newBid").addTerms(new NumberTermImpl(injuredId), new NumberTermImpl(currentBids.get(rescuerId).get(injuredId))));
-                counter++;
             }
-            informAgsEnvironmentChanged(agentNames.get(rescuerId));
         }
-        //Adding perception to the controller agent about the remaining bids and initializing the best cost for the injureds.
-        addPercept(controllerName, Literal.parseLiteral("remaining").addTerms(new NumberTermImpl(counter)));
-        addPercept(controllerName, Literal.parseLiteral("bestCost").addTerms(
-                new NumberTermImpl(RescueFramework.getMap().getHeight() + RescueFramework.getMap().getWidth())
-        ));
-        informAgsEnvironmentChanged(controllerName);
+
+        informAgsEnvironmentChanged();
     }
 
     /**
@@ -178,6 +185,7 @@ public class Env extends Environment{
         agentNames.put(id, name);
         try{
             getEnvironmentInfraTier().getRuntimeServices().createAgent(name, "src/main/asl/rescuer.asl", null, null, null, null, null);
+            getEnvironmentInfraTier().getRuntimeServices().startAgent(name);
         }
         catch (Exception e){
             System.err.println("Agent creation failed.");

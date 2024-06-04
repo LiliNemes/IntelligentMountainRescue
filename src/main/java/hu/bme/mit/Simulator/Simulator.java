@@ -33,6 +33,7 @@ public class Simulator {
     private TimeStepper timeStepper = null;
     private int savedPeople = 0;
     private int deadPeople = 0;
+    private boolean stopped = true;
 
     /**
      * Starts the simulation.
@@ -43,6 +44,7 @@ public class Simulator {
         }
         timeStepper = new TimeStepper(this);
         new Thread(timeStepper).start();
+        stopped = false;
     }
 
     /**
@@ -87,7 +89,8 @@ public class Simulator {
      */
     private void rescuedPerson(Rescuer rescuer, Field location){
         for(Integer injuredId : injureds.keySet()){
-           if ( injureds.get(injuredId).getLocation() == location){
+           if (injureds.get(injuredId).getLocation() == location){
+               location.removeVisitor(injureds.get(injuredId));
                injureds.remove(injuredId);
                break;
            }
@@ -130,7 +133,7 @@ public class Simulator {
     /**
      * Starts the bidding.
      */
-    private void optimization(){
+    public void optimization(){
         // storing the bids: HashMap<rescuer, HasMap<injured, distance>>
         HashMap<Integer, HashMap<Integer, Integer>> bids = new HashMap<>();
         // for each rescuer
@@ -171,7 +174,8 @@ public class Simulator {
      */
     public void addInjured(Injured injured){
         injureds.put(injured.getId(), injured);
-        optimization();
+        if (!stopped)
+            optimization();
     }
 
     /**
@@ -180,6 +184,7 @@ public class Simulator {
     public void stop() {
         if (timeStepper != null)
             timeStepper.stop();
+        stopped = true;
     }
 
     /**

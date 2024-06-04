@@ -12,57 +12,61 @@
 !start.
 
 +!start <-
-    .print("Agent Controller started.");
-    +remainingVotes(0);
-    +bestBid(infinity, none, none);
-    .print("Initialization complete: remainingVotes(0), bestBid(infinity, none, none)").
+    +lock(free);
+    .print("Agent Controller started.").
 
-// Handle receiving a new bid when it is better than the current best
-+!processBid(BidValue, Rescuer, Injured) : remainingVotes(VotesLeft) & bestBid(CurrentBest, _, _) & BidValue < CurrentBest <-
-    !updateBestBid(BidValue, Rescuer, Injured);
-    !decreaseVotes.
++!updateMin(Rescuer, Injured, Cost) : bestCost(C) & (C > Cost) & remaining(R) & (R > 1) & lock(free) <-
+    .abolish(lock(_));
+    +lock(busy);
+    .print("New minimum cost: ", Cost, " instead of ", C, " for ", Rescuer, " to reach ", Injured, " with ", R-1, " votes left.");
+    .abolish(bestCost(_));
+    +bestCost(Cost);
+    .abolish(minRescuer(_));
+    +minRescuer(Rescuer);
+    .abolish(minInjured(_));
+    +minInjured(Injured);
+    .abolish(remaining(_));
+    +remaining(R-1);
+    .abolish(lock(_));
+    +lock(free).
 
-// Handle receiving a new bid when it is not better than the current best
-+!processBid(BidValue, Rescuer, Injured) : remainingVotes(VotesLeft) & bestBid(CurrentBest, _, _) & BidValue >= CurrentBest <-
-    !decreaseVotes.
++!updateMin(Rescuer, Injured, Cost) : bestCost(C) & (C <= Cost) & remaining(R) & (R > 1) & lock(free) <-
+    .abolish(lock(_));
+    +lock(busy);
+    .print("New cost: ", Cost, " against ", C, " for ", Rescuer, " to reach ", Injured, " with ", R-1, " votes left.");
+    .abolish(remaining(_));
+    +remaining(R-1);
+    .abolish(lock(_));
+    +lock(free).
 
-// Update the best bid
-+!updateBestBid(BidValue, Rescuer, Injured) <-
-    -bestBid(_, _, _);
-    +bestBid(BidValue, Rescuer, Injured).
++!updateMin(Rescuer, Injured, Cost) : bestCost(C) & (C > Cost) & remaining(1) & lock(free) <-
+    .abolish(lock(_));
+    +lock(busy);
+    .print("New minimum cost: ", Cost, " instead of ", C, " for ", Rescuer, " to reach ", Injured, " with 0 votes left.");
+    .abolish(bestCost(_));
+    +bestCost(Cost);
+    .print("Last vote received.");
+    .abolish(remaining(_));
+    .abolish(bestCost(_));
+    .abolish(minRescuer(_));
+    .abolish(minInjured(_));
+    optimize(Rescuer, Injured);
+    .abolish(lock(_));
+    +lock(free).
 
-// Decrease the number of remaining votes
-+!decreaseVotes : remainingVotes(VotesLeft) <-
-    NewVotesLeft = VotesLeft - 1;
-    -remainingVotes(VotesLeft);
-    +remainingVotes(NewVotesLeft);
-    !checkFinalizeVote.
++!updateMin(Rescuer, Injured, Cost) : bestCost(C) & (C <= Cost) & remaining(1) & lock(free) & minRescuer(R) & minInjured(I) <-
+    .abolish(lock(_));
+    +lock(busy);
+    .print("New cost: ", Cost, " against ", C, " for ", Rescuer, " to reach ", Injured, " with 0 votes left.");
+    .print("Last vote received.");
+    .abolish(remaining(_));
+    .abolish(bestCost(_));
+    .abolish(minRescuer(_));
+    .abolish(minInjured(_));
+    optimize(R, I);
+    .abolish(lock(_));
+    +lock(free).
 
-// Check if finalization is needed
-+!checkFinalizeVote : remainingVotes(0) <-
-    !finalizeVoteWithBestBid.
-
-+!checkFinalizeVote : remainingVotes(VotesLeft) & VotesLeft > 0 <-
-    .print("Remaining votes: ", VotesLeft, ". Continuing bid processing.").
-
-// Finalize the voting process with the best bid
-+!finalizeVoteWithBestBid : bestBid(BestValue, BestRescuer, BestInjured) & BestValue \== infinity <-
-    .send(env, achieve, allocateInjured(BestRescuer, BestInjured)).
-
-// Handle the case when no valid bids are received
-+!finalizeVoteWithBestBid : bestBid(BestValue, _, _) & BestValue == infinity <-
-    .print("No valid bids received.").
-
-// Percept handler for new bids
-+percept(newBid(Injured, BidValue, Rescuer)) <-
-    !processBid(BidValue, Rescuer, Injured).
-
-// Percept handler for remaining votes
-+percept(remaining(Votes)) <-
-    -remainingVotes(_);
-    +remainingVotes(Votes).
-
-// Percept handler for the best cost
-+percept(bestCost(Value)) <-
-    -bestBid(_, _, _);
-    +bestBid(Value, none, none).
++!updateMin(Rescuer, Injured, Cost) <-
+    .print("Invalid update.");
+    .send(Rescuer, achieve, retry(Rescuer, Injured, Cost)).

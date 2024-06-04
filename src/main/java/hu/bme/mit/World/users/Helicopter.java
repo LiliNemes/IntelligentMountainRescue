@@ -22,7 +22,7 @@ public class Helicopter extends Rescuer{
 
     @Override
     public boolean canGetThere(Field field){
-        return field.getFlatness();
+        return field.getFlatness() && (this.targetLocation != null || this.path.isEmpty());
     }
 
     /**
@@ -42,37 +42,36 @@ public class Helicopter extends Rescuer{
      */
     @Override
     public Action step(boolean bothCanStep) {
-        // Ha bothCanStep értéke false, akkor a másik mentőegység nincs rendelkezésre a lépéshez,
-    // ezért a helikopter is léphet.
-    if (!bothCanStep) {
-        // Ha a másik mentőegység nem léphet, de a helikopter rendelkezésre áll,
-        // akkor az MOVE akcióval lépjen.
-        return Action.MOVE;
-    } else {
+
         // Ha mindkét mentőegység rendelkezésre áll a lépéshez,
         // akkor meg kell vizsgálni a helikopter célját és útvonalát.
         if (!path.isEmpty()) {
-            // Ha a helikopter még rendelkezik útvonallal,
-            // akkor MOVE akcióval lépjen a következő mezőre az útvonal mentén.
+            Direction direction = path.removeFirst();
+            currentLocation.removeVisitor(this);
+            currentLocation = currentLocation.getNeighbour(direction);
+            currentLocation.addVisitor(this);
+
+            // Ha a helikopter elérte az emberéhez (céljához) tartózkodó mezőt,
+            // akkor vegye fel az illetőt.
+            if (currentLocation == targetLocation){
+                if (!path.isEmpty())
+                    throw new RuntimeException("Path should be empty when reaching the target");
+                return Action.PICKUP;
+            }
+            // Ha a helikopter elérte a szállítási állomást,
+            // és nem rendelkezik további útvonallal,
+            // akkor adja le a szállított sérültet.
+            else if (targetLocation == null && path.isEmpty()) {
+                return Action.DELIVER;
+            }
+
             return Action.MOVE;
         }
 
-        // Ha a helikopter elérte az emberéhez (céljához) tartózkodó mezőt,
-        // akkor vegye fel az illetőt.
-        if (currentLocation == targetLocation && targetLocation == null){
-            return Action.PICKUP;
-        } 
-        // Ha a helikopter elérte a szállítási állomást,
-        // és nem rendelkezik további útvonallal,
-        // akkor adja le a szállított sérültet.
-        else if (targetLocation == null && path.isEmpty()) {
-            return Action.DELIVER;
+        // Alapértelmezett esetben, ha nincs más teendő,
+        // akkor is MOVE akcióval térjen vissza.
+        return Action.MOVE;
         }
-    }
-    // Alapértelmezett esetben, ha nincs más teendő,
-    // akkor is MOVE akcióval térjen vissza.
-    return Action.MOVE;
-    }
 
     /**
      * Draws the helicopter on the field.

@@ -66,7 +66,7 @@ public abstract class Rescuer implements Drawable {
      * @return true if the rescuer can get to the field, false otherwise.
      */
     public boolean canGetThere(Field field){
-        return true;
+        return this.targetLocation != null || this.path.isEmpty();
     }
 
     /**

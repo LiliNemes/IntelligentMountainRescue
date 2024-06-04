@@ -11,12 +11,11 @@
     .print("Agent Rescuer started.").
 
 
-// Reakció a newBid belief érkezésére
-+!processBid(BidValue, Bidder) : newBid(BidValue, Bidder) <-
-    .my_name(Me);
-    .send(controller, tell, setBids(Me, BidValue, Bidder));
-    -newBid(BidValue, Bidder).
++newBid(I, V) : .my_name(Me) <-
+    .send(controller, achieve, updateMin(Me, I, V));
+    .print("Agent ", Me, ": newBid received, forwarding to controller.");
+    .abolish(newBid(I, V)).
 
-// Példa percept kezelés (nem szükséges, ha nem kap új percepteket)
-+percept(newBid(BidValue, Bidder)) <-
-    !processBid(BidValue, Bidder).
++!retry(Rescuer, Injured, Cost) <-
+    .wait(100);
+    .send(controller, achieve, updateMin(Rescuer, Injured, Cost)).

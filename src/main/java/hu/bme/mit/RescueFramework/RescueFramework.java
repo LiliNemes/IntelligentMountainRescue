@@ -61,6 +61,7 @@ public class RescueFramework {
             agentId++;
         }
         mainFrame.refresh();
+        simulator.optimization();
     }
 
     public static void endSimulation() {
