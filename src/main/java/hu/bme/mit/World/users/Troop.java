@@ -1,5 +1,6 @@
 package hu.bme.mit.World.users;
 
+import hu.bme.mit.World.fields.Direction;
 import hu.bme.mit.World.fields.Field;
 
 import javax.imageio.ImageIO;
@@ -14,6 +15,7 @@ import java.io.IOException;
 public class Troop extends Rescuer{
 
     private final String imageName = "troop.png";
+    private final int slowness = 3;
 
     public Troop(Field location, int id) {
         super(location, id);
@@ -26,12 +28,32 @@ public class Troop extends Rescuer{
      */
     @Override
     public Action step(boolean bothCanStep) {
-        //TODO
-        //Ha false a paraméter, akkor ne lépjen.
-        //Lépjen a path-ját követve.
-        //Ha elér az emberéhez (céljához) vegye fel.
-        //Olyan Actionnel térjen vissza ami igaz arra amit csinált.
-        return Action.MOVE;
+        if (!bothCanStep) {
+            return Action.MOVE;
+        } else {
+            if (!path.isEmpty()) {
+                Direction direction = path.removeFirst();
+                currentLocation.removeVisitor(this);
+                currentLocation = currentLocation.getNeighbour(direction);
+                currentLocation.addVisitor(this);
+
+                if (currentLocation == targetLocation) {
+                    if (!path.isEmpty())
+                        throw new RuntimeException("Path should be empty when reaching the target");
+
+                    return Action.PICKUP;
+                } else if (targetLocation == null && path.isEmpty()) {
+                    return Action.DELIVER;
+                }
+
+            }
+            return Action.MOVE;
+        }
+    }
+
+    @Override
+    public int getWeightedDistance(int physicalDistance) {
+        return this.slowness * physicalDistance;
     }
 
     /**

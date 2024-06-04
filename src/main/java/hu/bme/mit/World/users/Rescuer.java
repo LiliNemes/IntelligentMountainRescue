@@ -66,7 +66,7 @@ public abstract class Rescuer implements Drawable {
      * @return true if the rescuer can get to the field, false otherwise.
      */
     public boolean canGetThere(Field field){
-        return true;
+        return this.targetLocation != null || this.path.isEmpty();
     }
 
     /**
@@ -77,7 +77,27 @@ public abstract class Rescuer implements Drawable {
         this.targetLocation = location;
     }
 
+    /**
+     * Sets the path of the rescuer.
+     * @param path the path of the rescuer.
+     */
     public void setPath(List<Direction> path){
         this.path = path;
     }
+
+    /**
+     * Resets the target location and the path of the rescuer.
+     */
+    public void resetTarget() {
+        this.targetLocation = null;
+        this.path.clear();
+    }
+
+    /**
+     * Calculate the rescuer's weighted distance based on its speed
+     * if the rescuer is a slower one, he/she should multiply the got distance by his/her slowness
+     * @param physicalDistance the distance to weigh
+     * @return the weighted distance
+     */
+    public abstract int getWeightedDistance(int physicalDistance);
 }

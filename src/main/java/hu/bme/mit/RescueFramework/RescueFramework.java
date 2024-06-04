@@ -2,7 +2,6 @@ package hu.bme.mit.RescueFramework;
 
 import hu.bme.mit.Simulator.Env;
 import hu.bme.mit.Simulator.Simulator;
-import hu.bme.mit.World.fields.Coordinate;
 import hu.bme.mit.World.fields.Map;
 import hu.bme.mit.World.users.Helicopter;
 import hu.bme.mit.World.users.Troop;
@@ -62,6 +61,7 @@ public class RescueFramework {
             agentId++;
         }
         mainFrame.refresh();
+        simulator.optimization();
     }
 
     public static void endSimulation() {

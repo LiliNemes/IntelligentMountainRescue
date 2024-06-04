@@ -14,9 +14,9 @@ import java.util.List;
 
 /**
  * The simulator class for the simulation.
- * injureds: the list of injureds in the simulation.
+ * injureds: the map of the injureds in the simulation by their ids.
  * toRemove: the list of injureds and rescuers to be removed from the simulation.
- * rescuers: the list of rescuers in the simulation.
+ * rescuers: the map of the rescuers in the simulation by their ids.
  * time: the current time of the simulation.
  * helicopterSpeed: the speed of the helicopter.
  * timeStepper: the timeStepper of the simulation.
@@ -33,6 +33,7 @@ public class Simulator {
     private TimeStepper timeStepper = null;
     private int savedPeople = 0;
     private int deadPeople = 0;
+    private boolean stopped = true;
 
     /**
      * Starts the simulation.
@@ -43,6 +44,7 @@ public class Simulator {
         }
         timeStepper = new TimeStepper(this);
         new Thread(timeStepper).start();
+        stopped = false;
     }
 
     /**
@@ -87,13 +89,15 @@ public class Simulator {
      */
     private void rescuedPerson(Rescuer rescuer, Field location){
         for(Integer injuredId : injureds.keySet()){
-           if ( injureds.get(injuredId).getLocation() == location){
+           if (injureds.get(injuredId).getLocation() == location){
+               location.removeVisitor(injureds.get(injuredId));
                injureds.remove(injuredId);
                break;
            }
         }
         List<Direction> path = RescueFramework.getMap().getNearestStation(location);
         rescuer.setPath(path);
+        rescuer.setTargetLocation(null);
     }
 
     /**
@@ -129,7 +133,7 @@ public class Simulator {
     /**
      * Starts the bidding.
      */
-    private void optimization(){
+    public void optimization(){
         // storing the bids: HashMap<rescuer, HasMap<injured, distance>>
         HashMap<Integer, HashMap<Integer, Integer>> bids = new HashMap<>();
         // for each rescuer
@@ -138,8 +142,12 @@ public class Simulator {
             //for each injured calculates the distance from the rescuer.
             for (Injured injured : injureds.values()){
                 if (rescuer.canGetThere(injured.getLocation()))
-                    distances.put(injured.getId(),
-                            Map.getPath(rescuer.getCurrentLocation(), injured.getLocation()).size());
+                    distances.put(
+                            injured.getId(),
+                            rescuer.getWeightedDistance(
+                                    Map.getPath(rescuer.getCurrentLocation(), injured.getLocation()).size()
+                            )
+                    );
             }
             //If the rescuer can reach at least one injured, adds the distances to the bids.
             if (!distances.isEmpty())
@@ -166,7 +174,8 @@ public class Simulator {
      */
     public void addInjured(Injured injured){
         injureds.put(injured.getId(), injured);
-        optimization();
+        if (!stopped)
+            optimization();
     }
 
     /**
@@ -175,6 +184,7 @@ public class Simulator {
     public void stop() {
         if (timeStepper != null)
             timeStepper.stop();
+        stopped = true;
     }
 
     /**
@@ -211,5 +221,13 @@ public class Simulator {
      */
     public void setSpeed(int speed) {
         timeStepper.setSpeed(speed);
+    }
+
+    /**
+     * Resets the target of the given rescuer.
+     * @param rescuerId the id of the rescuer to reset his/her target.
+     */
+    public void resetTarget(int rescuerId) {
+        rescuers.get(rescuerId).resetTarget();
     }
 }
